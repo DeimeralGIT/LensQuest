@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
-    "start": "node dist/server.cjs",
-    "lint": "tsc --noEmit"
+    "build:web": "vite build",
+    "build:server": "esbuild server.ts --bundle --platform=node --format=cjs --packages=external --outfile=build/server.cjs",
+    "build": "npm run build:web && npm run build:server",
+    "start": "node build/server.cjs",
+    "lint": "tsc --noEmit",
+    "notify:deploy": "node scripts/notify-deploy.mjs",
+    "deploy:hosting": "npm run build:web && firebase deploy --only hosting && npm run notify:deploy"
   },
   "dependencies": {
     "@firebase/eslint-plugin-security-rules": "^0.0.2",
@@ -17,6 +21,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
+    "firebase-admin": "^12.7.0",
     "firebase": "^12.13.0",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",

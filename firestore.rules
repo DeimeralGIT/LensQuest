@@ -28,18 +28,20 @@ service cloud.firestore {
       return data.userId is string &&
              data.userId == request.auth.uid &&
              data.title is string &&
+             data.title.size() > 0 &&
              data.title.size() <= 100 &&
              data.description is string &&
              data.description.size() <= 1000 &&
              data.imageUrl is string &&
+             data.imageUrl.size() > 0 &&
              data.location is map &&
              data.location.lat is number &&
              data.location.lng is number &&
-             (data.get('aiTips', '') is string) &&
-             (data.get('userName', '') is string) &&
-             (data.get('tags', []) is list) &&
-             data.keys().hasAll(['userId', 'title', 'description', 'imageUrl', 'location', 'createdAt', 'userName', 'tags', 'aiTips']) &&
-             data.keys().size() == 9;
+             data.tags is list &&
+             data.get('userName', '') is string &&
+             data.get('userPhotoURL', '') is string &&
+             data.get('reviewCount', 0) is number &&
+             data.get('averageRating', 0) is number;
     }
 
     match /spots/{spotId} {
@@ -47,24 +49,57 @@ service cloud.firestore {
       allow read: if true;
       
       allow create: if isSignedIn() && 
-                      isValidId(spotId) && 
-                      isValidSpot(incoming()) &&
-                      incoming().createdAt == request.time;
+                      isValidSpot(incoming());
       
       allow update: if isSignedIn() && 
-                      isOwner(existing().userId) &&
-                      isValidSpot(incoming()) &&
-                      incoming().userId == existing().userId &&
-                      incoming().createdAt == existing().createdAt &&
-                      incoming().diff(existing()).affectedKeys().hasOnly(['title', 'description', 'location', 'imageUrl', 'tags', 'aiTips']);
+                      request.auth.uid == resource.data.userId &&
+                      isValidSpot(incoming());
       
       allow delete: if isSignedIn() && isOwner(existing().userId);
+
+      // Reviews subcollection
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isSignedIn();
+        allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
+      }
+    }
+
+    match /reviews/{spotId}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() &&
+                      reviewId == request.auth.uid &&
+                      !exists(/databases/$(database)/documents/reviews/$(spotId)/reviews/$(request.auth.uid)) &&
+                      request.resource.data.userId is string &&
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.rating is number &&
+                      request.resource.data.text is string &&
+                      request.resource.data.spotId is string;
+      allow update, delete: if isSignedIn() && request.auth.uid == resource.data.userId;
     }
 
     match /users/{userId}/profile/public {
       allow read: if true;
       allow create, update: if isSignedIn() && isOwner(userId);
       allow delete: if isSignedIn() && isOwner(userId);
+    }
+
+    match /imageReports/{reportId} {
+      allow create: if request.resource.data.spotId is string &&
+                      request.resource.data.ownerUserId is string &&
+                      request.resource.data.ownerUserName is string &&
+                      request.resource.data.imageUrl is string &&
+                      request.resource.data.title is string &&
+                      request.resource.data.reason is string &&
+                      request.resource.data.reason.size() > 0 &&
+                      request.resource.data.reason.size() <= 1000 &&
+                      request.resource.data.reporterUserName is string &&
+                      request.resource.data.status == 'pending' &&
+                      (
+                        (!isSignedIn() && request.resource.data.reporterUserId == null) ||
+                        (isSignedIn() && request.resource.data.reporterUserId == request.auth.uid)
+                      );
+      allow read, update, delete: if false;
     }
 
     // Allow connection test document

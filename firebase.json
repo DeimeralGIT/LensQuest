@@ -1,6 +1,15 @@
 {
+  "functions": {
+    "source": "functions",
+    "postdeploy": [
+      "npm run notify:deploy"
+    ]
+  },
   "hosting": {
     "public": "dist",
+    "postdeploy": [
+      "npm run notify:deploy"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -8,10 +17,28 @@
     ],
     "rewrites": [
       {
+        "source": "/api/report-image",
+        "function": "reportImage"
+      },
+      {
+        "source": "/api/moderation/delete-image",
+        "function": "moderationDeleteImage"
+      },
+      {
+        "source": "/api/moderation/block-user",
+        "function": "moderationBlockUser"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
     ]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
   },
   "firestore": {
     "rules": "firestore.rules"
