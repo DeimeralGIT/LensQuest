@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Moon, Sun, LogOut, Link2, Aperture } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -25,10 +25,10 @@ export default function ProfileMenu({
 }: ProfileMenuProps) {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isOpeningSettings, setIsOpeningSettings] = useState(false);
-    const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number } | null>(null);
+    const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
     const openingTimeoutRef = React.useRef<number | null>(null);
 
-    const updateMenuPosition = React.useCallback(() => {
+    const updateMenuPosition = useCallback(() => {
         const trigger = triggerRef.current;
         if (!trigger) {
             setMenuPosition(null);
@@ -56,7 +56,7 @@ export default function ProfileMenu({
         };
     }, []);
 
-    React.useLayoutEffect(() => {
+    useLayoutEffect(() => {
         if (!isOpen) {
             setMenuPosition(null);
             return;
