@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "Spot": {
+      "title": "Photography Spot",
+      "description": "A location suitable for photography with user-contributed details.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          }
+        },
+        "imageUrl": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "aiTips": { "type": "string", "description": "AI-generated photography tips for this spot." }
+      },
+      "required": ["userId", "title", "location", "imageUrl"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "Basic public user profile information.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["userId", "displayName"]
+    }
+  },
+  "firestore": {
+    "/spots/{spotId}": {
+      "schema": "Spot",
+      "description": "Photography spots shared by users."
+    },
+    "/users/{userId}/profile/public": {
+      "schema": "User",
+      "description": "Public profile for a user."
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "LensQuest",
+  "description": "Discover and share the world's most photogenic spots. Explore interactive maps, get AI photography tips for any location, and share your best shots with the community.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
