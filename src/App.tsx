@@ -35,6 +35,7 @@ type CreatorSummary = {
 };
 
 export default function App() {
+  const profileMenuButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -585,6 +586,7 @@ export default function App() {
             {user ? (
               <div className="flex items-center gap-2 md:gap-4 relative">
                 <button
+                  ref={profileMenuButtonRef}
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="w-6 md:w-8 h-6 md:h-8 rounded-full border-2 border-editorial-black/10 hover:border-accent transition-colors overflow-hidden hover:shadow-lg"
                 >
@@ -597,6 +599,7 @@ export default function App() {
                   isDarkMode={isDarkMode}
                   onToggleDarkMode={handleToggleDarkMode}
                   buyMeCoffeeUrl={userProfile?.buyMeCoffeeUrl}
+                  triggerRef={profileMenuButtonRef}
                 />
               </div>
             ) : (
